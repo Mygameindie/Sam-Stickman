@@ -131,7 +131,9 @@ window.PET_GENDER_CONFIG = window.PET_GENDER_CONFIG || {
   function pointAtGender(im, rawName) {
     const sfx = suffixFor(current);
     im.__petGenderRaw = rawName;
-    im.__petGenderFallback = sfx ? rawName : null;
+    // The plain body (base.png) is built from the _2 parts by asset_path_fix.js
+    // when base_2.png is missing, so it never borrows the other gender's picture.
+    im.__petGenderFallback = sfx && !/^base\.[a-z0-9]+$/i.test(rawName) ? rawName : null;
     armImage(im);
     setRaw(im, withSuffix(rawName, sfx));
   }
