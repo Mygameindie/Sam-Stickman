@@ -86,7 +86,8 @@
     const m = POSE.exec(failed);
     const core = m ? m[1].split('_').filter(t => t !== '2').join('_') : '';
     const two = fb === 'base_2.png';
-    const headUrl = IMAGE_DIR + 'parts/' + (m ? (HEAD_FILE[core] || 'head_' + core) : 'head') + (two ? '_2' : '') + '.png';
+    // The plain base (base.png / base_2.png) has no pose name: it gets the normal head.
+    const headUrl = IMAGE_DIR + 'parts/' + (core ? (HEAD_FILE[core] || 'head_' + core) : 'head') + (two ? '_2' : '') + '.png';
     const key = fb + '+' + headUrl;
     if (composed.has(key)) return cb(composed.get(key));
     const body = new Image(), head = new Image();
@@ -132,7 +133,9 @@
         if (!fb || (!plain && failed.split('?')[0].endsWith('/' + fb))) return;
         withHead(failed, fb, url => {
           if (img.src !== failed) return;
-          if (!url && plain) return;           // nothing to build it from
+          // Nothing to build the boy's base from: use the plain (girl) picture
+          // rather than leave the pet invisible.
+          if (!url && plain) { if (plain[1]) desc.set.call(img, IMAGE_DIR + 'base.png'); return; }
           if (!url) img._fallbackBase = true;
           img.addEventListener('load', () => { img._failed = false; }, { once: true });
           desc.set.call(img, url || IMAGE_DIR + fb);
